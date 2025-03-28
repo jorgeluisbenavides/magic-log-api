@@ -1,6 +1,8 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { UserProfile } from 'src/enums/enum';
+import { Entity, Column, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
 @Entity('users')
+@Unique(['email'])
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -14,7 +16,10 @@ export class User {
   @Column()
   password: string;
 
-  @Column()
+  @Column({
+    type: 'enum',
+    enum: UserProfile,
+  })
   profile: string;
 
   @Column({ default: true })
