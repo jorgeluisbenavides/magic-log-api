@@ -1,14 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository} from '@nestjs/typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { User } from './../entities/user.entity';
 
+import { CreateUserDto } from '../dtos/CreateUserDto';
+
 @Injectable()
 export class UsersService {
-
   constructor(
-    @InjectRepository(User) private userRepository: Repository<User>  
+    @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
 
   findAll() {
@@ -16,24 +17,24 @@ export class UsersService {
   }
 
   findOne(id: number) {
-    return this.userRepository.find({where: { id: id }});
+    return this.userRepository.find({ where: { id: id } });
   }
 
-  create(body: any) {
+  create(body: CreateUserDto) {
     const newUser = this.userRepository.create(body);
-    
+
     return this.userRepository.save(newUser);
   }
 
   async update(id: number, body: any) {
-    const [user] = await this.userRepository.find({where: { id: id }});
+    const [user] = await this.userRepository.find({ where: { id: id } });
 
     return this.userRepository.merge(user, body);
   }
 
-  async delete (id: number) {
+  async delete(id: number) {
     await this.userRepository.delete(id);
-    
+
     return true;
   }
 }

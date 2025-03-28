@@ -6,7 +6,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 
-
 dotenv.config();
 
 @Module({
@@ -21,9 +20,10 @@ dotenv.config();
       entities: ['dist/**/*.entity{.ts,.js}'],
       synchronize: true,
       retryDelay: 3000,
-      retryAttempts: 10
+      retryAttempts: 10,
     }),
-    UsersModule],
+    UsersModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
