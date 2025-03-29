@@ -1,7 +1,8 @@
-import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Request, UseGuards } from '@nestjs/common';
 import { CreateOrUpdateProductDto } from '../dto/CreateOrUpdateProductDto';
 import { ProductsService } from '../services/products.service';
 import { AuthGuard } from '@nestjs/passport';
+import { ResponseProductDto } from '../dto/ResponseProductDto';
 
 @Controller('api/products')
 export class ProductsController {
@@ -11,6 +12,33 @@ export class ProductsController {
   @UseGuards(AuthGuard('jwt'))
   @Post()
   create(@Request() req, @Body() bodyDto: CreateOrUpdateProductDto) {
-    return this.productService.create(req, bodyDto);
+    const { id } = req.user;
+
+    return this.productService.create(id, bodyDto);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('user')
+  getUserWithProducts(@Request() req) {
+    const { id } = req.user;
+
+    return this.productService.getUserWithProducts(id);
+  }
+
+  @Get()
+  async getProductsByParams(
+    @Query('sku') sku?: string,
+    @Query('name') name?: string,
+    @Query('userId') userId?: number,
+    @Query('minPrice') minPrice?: number,
+    @Query('maxPrice') maxPrice?: number,
+  ): Promise<ResponseProductDto[]> {
+    return this.productService.getProductsByParams({
+      sku,
+      name,
+      userId: userId ? Number(userId) : 0,
+      minPrice: minPrice ? Number(minPrice) : 0,
+      maxPrice: maxPrice ? Number(maxPrice) : 0,
+    });
   }
 }

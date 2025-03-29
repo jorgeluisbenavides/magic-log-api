@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -35,8 +35,11 @@ dotenv.config();
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule implements NestModule{
+export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(JwtAuthMiddleware).forRoutes('api/products');  
+    consumer.apply(JwtAuthMiddleware).forRoutes(
+      { path: 'api/products', method: RequestMethod.ALL },
+      { path: 'api/purchases', method: RequestMethod.ALL },
+    );
   }
 }

@@ -12,10 +12,14 @@ import { User } from './entities/user.entity';
     TypeOrmModule.forFeature([User]),
   ],
   providers: [
-    UsersService, 
+    UsersService,
     // AuthService
   ],
   controllers: [UsersController],
-  exports: [UsersService, TypeOrmModule]
+  exports: [
+    UsersService,
+    TypeOrmModule,
+    TypeOrmModule,
+  ]
 })
-export class UsersModule {}
+export class UsersModule { }

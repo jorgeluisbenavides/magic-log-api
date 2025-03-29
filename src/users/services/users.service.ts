@@ -59,8 +59,9 @@ export class UsersService {
   async update(id: number, body: CreateOrUpdateUserDto) {
     const [user] = await this.userRepository.find({ where: { id: id } });
     if (!user) throw new NotFoundException('Usuario no encontrado');
+    const hashedPassword = await bcrypt.hash(body.password, 10);
 
-    const merge = this.userRepository.merge(user, body as DeepPartial<User>);
+    const merge = this.userRepository.merge(user, { ...body, password: hashedPassword } as DeepPartial<User>);
 
     return await this.userRepository.save(merge);
   }

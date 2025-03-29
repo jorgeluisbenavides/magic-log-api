@@ -19,9 +19,9 @@ export class PurchaseProduct {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
 
-  @ManyToOne(() => Purchase, (purchase) => purchase.purchaseProducts)
+  @ManyToOne(() => Purchase, (purchase) => purchase.purchaseProducts, { eager: true })
   purchase: Purchase;
 
-  @ManyToOne(() => Product, (product) => product.purchaseProducts)
+  @ManyToOne(() => Product, (product) => product.purchaseProducts, { eager: true })
   product: Product;
 }
