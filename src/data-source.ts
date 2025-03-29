@@ -1,6 +1,9 @@
 import { DataSource } from 'typeorm';
 import * as dotenv from 'dotenv';
 import { User } from './users/entities/user.entity';
+import { Product } from './products/entities/product.entity';
+import { Purchase } from './purchases/entities/purchase.entity';
+import { PurchaseProduct } from './purchases/entities/purchaseProduct.entity';
 
 dotenv.config();
 
@@ -11,8 +14,13 @@ export const AppDataSource = new DataSource({
   username: process.env.DB_USER || 'postgres',
   password: process.env.DB_PASS || 'password',
   database: process.env.DB_NAME || 'mi_db',
-  entities: [User],
+  entities: [
+    User,
+    Product,
+    Purchase,
+    PurchaseProduct,
+  ],
   migrations: ['src/migrations/*.ts'],
-  synchronize: false, // No sincronizar automáticamente, siempre usar migraciones
-  logging: true, // Activa los logs para ver las operaciones
+  synchronize: false,
+  logging: true,
 });

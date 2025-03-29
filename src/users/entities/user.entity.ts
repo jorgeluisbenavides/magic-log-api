@@ -1,5 +1,7 @@
 import { UserProfile } from 'src/enums/enum';
-import { Entity, Column, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { Product } from 'src/products/entities/product.entity';
+import { Purchase } from 'src/purchases/entities/purchase.entity';
+import { Entity, Column, PrimaryGeneratedColumn, Unique, OneToMany } from 'typeorm';
 
 @Entity('users')
 @Unique(['email'])
@@ -30,4 +32,10 @@ export class User {
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
+
+  @OneToMany(() => Product, (product) => product.user)
+  products: Product[];
+
+  @OneToMany(() => Purchase, (purchase) => purchase.user)
+  purchases: Purchase[];
 }

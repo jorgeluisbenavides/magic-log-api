@@ -5,6 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
+import { ProductsModule } from './products/products.module';
+import { PurchasesModule } from './purchases/purchases.module';
 
 dotenv.config();
 
@@ -23,6 +25,8 @@ dotenv.config();
       retryAttempts: 10,
     }),
     UsersModule,
+    ProductsModule,
+    PurchasesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
