@@ -17,6 +17,9 @@ export class Product {
   @Column()
   quantity: number;
 
+  @Column({ type: 'decimal', nullable: false })
+  price: number;
+
   @Column({ default: true })
   active: boolean;
 

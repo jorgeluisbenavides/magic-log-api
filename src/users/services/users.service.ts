@@ -6,18 +6,31 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, Repository } from 'typeorm';
-
+import * as bcrypt from 'bcrypt';
 import { User } from './../entities/user.entity';
 import { CreateOrUpdateUserDto } from '../dtos/CreateOrUpdateUserDto';
+import { ResponseUserDto } from '../dtos/ResponseUserDto';
+import { UserMapper } from 'src/mappers/userMapperDto';
+//import { AuthService } from 'src/auth/services/auth.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
-  ) {}
+    //private readonly authService: AuthService,
+  ) { }
 
-  findAll() {
-    return this.userRepository.find();
+  async findByEmail(email: string) {
+    const [user] = await this.userRepository.find({ where: { email } });
+    if (!user) throw new NotFoundException('Usuario no encontrado');
+
+    return user;
+  }
+
+  async findAll(): Promise<ResponseUserDto[]> {
+    const users = await this.userRepository.find();
+
+    return UserMapper.toResponseDtoList(users);
   }
 
   async findOne(id: number) {
@@ -29,9 +42,12 @@ export class UsersService {
 
   async create(body: CreateOrUpdateUserDto) {
     try {
-      const user = this.userRepository.create(body as DeepPartial<User>);
+      const hashedPassword = await bcrypt.hash(body.password, 10);
+      const user = this.userRepository.create({ ...body, password: hashedPassword } as DeepPartial<User>);
 
-      return await this.userRepository.save(user);
+      const userSignIn = await this.userRepository.save(user);
+
+      return userSignIn; // await this.authService.login(userSignIn);
     } catch (err) {
       if (err.code === '23505') {
         throw new ConflictException('El email ya está en uso');
