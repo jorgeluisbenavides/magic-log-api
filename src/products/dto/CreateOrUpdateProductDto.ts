@@ -4,7 +4,6 @@ import {
   IsOptional,
   Length,
   IsInt,
-  IsDecimal,
 } from 'class-validator';
 
 export class CreateOrUpdateProductDto {
@@ -13,8 +12,8 @@ export class CreateOrUpdateProductDto {
   name: string;
 
   @IsString()
-  @Length(6, 25, {
-    message: 'La contraseña debe tener al menos 6 y 25 caracteres',
+  @Length(3, 25, {
+    message: 'El sku debe tener al menos 3 y 25 caracteres',
   })
   sku: string;
 
@@ -23,7 +22,9 @@ export class CreateOrUpdateProductDto {
   })
   quantity: number;
 
-  @IsDecimal()
+  @IsInt({
+    message: `El precio deber ser númerico`,
+  })
   price: number;
 
   @IsBoolean()

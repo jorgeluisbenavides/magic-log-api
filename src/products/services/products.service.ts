@@ -1,4 +1,9 @@
-import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, Repository } from 'typeorm';
 import { Product } from '../entities/product.entity';
@@ -12,18 +17,49 @@ export class ProductsService {
   constructor(
     @InjectRepository(Product) private productRepository: Repository<Product>,
     @InjectRepository(User) private userRepository: Repository<User>,
-  ) { }
+  ) {}
 
-  async create(id: number, body: CreateOrUpdateProductDto): Promise<ResponseProductDto> {
+  async create(
+    userId: number,
+    body: CreateOrUpdateProductDto,
+  ): Promise<ResponseProductDto> {
     try {
-      const user = await this.userRepository.findOne({ where: { id } });
-      if (!user) throw new NotFoundException('Usuario no encontrado')
+      const user = await this.userRepository.findOne({ where: { id: userId } });
+      if (!user) throw new NotFoundException('Usuario no encontrado');
 
-      const product = await this.productRepository.create({ ...body, user } as DeepPartial<Product>);
+      const product = await this.productRepository.create({
+        ...body,
+        user,
+      } as DeepPartial<Product>);
 
       const addedProduct = await this.productRepository.save(product);
 
       return ProductMapper.toResponseDto(addedProduct);
+    } catch (err) {
+      if (err.code === '23505') {
+        throw new ConflictException('El sku ya está en uso');
+      }
+      throw new InternalServerErrorException('Error al crear el producto');
+    }
+  }
+
+  async update(
+    productId: number,
+    body: CreateOrUpdateProductDto,
+  ): Promise<ResponseProductDto> {
+    try {
+      const product = await this.productRepository.findOne({
+        where: { id: productId },
+      });
+      if (!product) throw new NotFoundException('Producto no encontrado');
+
+      const merge = await this.productRepository.merge(product, {
+        ...body,
+      } as DeepPartial<Product>);
+
+      const savedProduct = await this.productRepository.save(merge);
+
+      return ProductMapper.toResponseDto(savedProduct);
     } catch (err) {
       if (err.code === '23505') {
         throw new ConflictException('El sku ya está en uso');
@@ -50,8 +86,14 @@ export class ProductsService {
     minPrice?: number;
     maxPrice?: number;
   }): Promise<ResponseProductDto[]> {
-    console.log('getProductsByParams::', params)
-    const { sku = '', name = '', userId = 0, minPrice = 0, maxPrice = 0 } = params;
+    console.log('getProductsByParams::', params);
+    const {
+      sku = '',
+      name = '',
+      userId = 0,
+      minPrice = 0,
+      maxPrice = 0,
+    } = params;
     const query = this.productRepository.createQueryBuilder('product');
 
     if (sku !== '') {

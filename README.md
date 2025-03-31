@@ -31,6 +31,17 @@
 $ npm install
 ```
 
+## run migration for develop 
+```bash
+# show migrations
+npm run migration:show 
+# generate migrations
+npm run migration:generate 
+# run migrations
+npm run migration:run 
+# revertion migrations
+npm run migration:revert 
+```
 ## Compile and run the project
 
 ```bash

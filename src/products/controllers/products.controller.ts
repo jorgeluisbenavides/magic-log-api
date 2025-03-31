@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Post, Query, Request, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { CreateOrUpdateProductDto } from '../dto/CreateOrUpdateProductDto';
 import { ProductsService } from '../services/products.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -6,8 +16,7 @@ import { ResponseProductDto } from '../dto/ResponseProductDto';
 
 @Controller('api/products')
 export class ProductsController {
-
-  constructor(private productService: ProductsService) { }
+  constructor(private productService: ProductsService) {}
 
   @UseGuards(AuthGuard('jwt'))
   @Post()
@@ -15,6 +24,15 @@ export class ProductsController {
     const { id } = req.user;
 
     return this.productService.create(id, bodyDto);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Put(':id')
+  update(
+    @Param('id') productId: number,
+    @Body() bodyDto: CreateOrUpdateProductDto,
+  ) {
+    return this.productService.update(productId, bodyDto);
   }
 
   @UseGuards(AuthGuard('jwt'))
